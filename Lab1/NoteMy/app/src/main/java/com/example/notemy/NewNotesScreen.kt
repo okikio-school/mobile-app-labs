@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -40,18 +41,45 @@ class NewNotesScreen : AppCompatActivity() {
         val deepGreenBtn = findViewById<Button>(R.id.color_btn_deep_green)
         val pastelPink = findViewById<Button>(R.id.color_btn_pastel_pink)
         val noteBackground = findViewById<View>(R.id.background)
+        val textTitle = findViewById<EditText>(R.id.editTextText)
+        val textSubTitle = findViewById<EditText>(R.id.editTextText2)
+        val mainNote = findViewById<EditText>(R.id.editTextTextMultiLine)
+        var currentColor = "white"
+        val colorSelection = arrayOf("white", "blue", "pastel pink", "deep green")
 
         blueBtn.setOnClickListener{
-            val color = ContextCompat.getColor(this, R.color.blue)
-            noteBackground.setBackgroundColor(color)
+            if (currentColor == "blue"){
+                currentColor = "white"
+                val color = ContextCompat.getColor(this, R.color.white)
+                noteBackground.setBackgroundColor(color)
+            } else {
+                val color = ContextCompat.getColor(this, R.color.blue)
+                noteBackground.setBackgroundColor(color)
+                currentColor = "blue"
+            }
         }
         deepGreenBtn.setOnClickListener{
-            val color = ContextCompat.getColor(this, R.color.deep_green)
-            noteBackground.setBackgroundColor(color)
+            if (currentColor == "deep green"){
+                currentColor = "white"
+                val color = ContextCompat.getColor(this, R.color.white)
+                noteBackground.setBackgroundColor(color)
+            } else {
+                val color = ContextCompat.getColor(this, R.color.deep_green)
+                noteBackground.setBackgroundColor(color)
+                currentColor = "deep green"
+            }
         }
         pastelPink.setOnClickListener{
-            val color = ContextCompat.getColor(this, R.color.pastel_pink)
-            noteBackground.setBackgroundColor(color)
+
+            if (currentColor == "pastel pink"){
+                currentColor = "white"
+                val color = ContextCompat.getColor(this, R.color.white)
+                noteBackground.setBackgroundColor(color)
+            } else {
+                val color = ContextCompat.getColor(this, R.color.pastel_pink)
+                noteBackground.setBackgroundColor(color)
+                currentColor = "pastel pink"
+            }
         }
 
     }
