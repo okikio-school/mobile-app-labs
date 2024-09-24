@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">NoteMy</string>
+    <string name="blue">Blue</string>
+    <string name="deep_green">Deep Green</string>
+    <string name="Back">Back</string>
+    <string name="Save">Save</string>
 </resources>
