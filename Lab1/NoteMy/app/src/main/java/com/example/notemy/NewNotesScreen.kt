@@ -2,11 +2,13 @@ package com.example.notemy
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
@@ -38,9 +40,20 @@ class NewNotesScreen : AppCompatActivity() {
         val deepGreenBtn = findViewById<Button>(R.id.color_btn_deep_green)
         val pastelPink = findViewById<Button>(R.id.color_btn_pastel_pink)
         val noteBackground = findViewById<View>(R.id.background)
+
         blueBtn.setOnClickListener{
-            noteBackground.setBackgroundColor(R.color.blue)
+            val color = ContextCompat.getColor(this, R.color.blue)
+            noteBackground.setBackgroundColor(color)
         }
+        deepGreenBtn.setOnClickListener{
+            val color = ContextCompat.getColor(this, R.color.deep_green)
+            noteBackground.setBackgroundColor(color)
+        }
+        pastelPink.setOnClickListener{
+            val color = ContextCompat.getColor(this, R.color.pastel_pink)
+            noteBackground.setBackgroundColor(color)
+        }
+
     }
 
     /**
