@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        val button = findViewById<FloatingActionButton>(R.id.floatingActionButton)
+        val button = findViewById<FloatingActionButton>(R.id.floating_action_button)
         button.setOnClickListener {
             // Call the launch method to switch to SecondActivity
             launch(NewNotesScreen::class.java)

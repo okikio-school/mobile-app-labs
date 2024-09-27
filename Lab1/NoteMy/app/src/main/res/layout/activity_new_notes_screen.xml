@@ -70,7 +70,7 @@
             />
 
         <EditText
-            android:id="@+id/editTextText"
+            android:id="@+id/titleText"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:autofillHints="none"
@@ -83,7 +83,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-            android:id="@+id/editTextText2"
+            android:id="@+id/subtitleText"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_marginTop="16dp"
@@ -94,10 +94,10 @@
             android:maxWidth="488dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextText" />
+            app:layout_constraintTop_toBottomOf="@+id/titleText" />
 
         <EditText
-            android:id="@+id/editTextTextMultiLine"
+            android:id="@+id/descriptionMultiLine"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="16dp"
@@ -111,7 +111,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editTextText2"
+            app:layout_constraintTop_toBottomOf="@+id/subtitleText"
             app:layout_constraintVertical_bias="0.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
