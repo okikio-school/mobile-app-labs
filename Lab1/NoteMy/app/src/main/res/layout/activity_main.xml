@@ -35,7 +35,7 @@
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
@@ -47,7 +47,7 @@
             android:id="@+id/scroll_layout"
             android:paddingTop="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/empty_view"
@@ -59,13 +59,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Uncomment this RecyclerView if needed -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:itemCount="3"
                 tools:listitem="@layout/note_view_design" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
