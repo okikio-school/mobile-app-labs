@@ -1,107 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-    <!-- Toolbar -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/materialToolbar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:title="@string/title"
+        android:titleTextColor="@color/design_default_color_on_primary"
+        android:titleTextAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_scrollFlags="scroll|enterAlways" />
 
-    <!-- TextView in Toolbar -->
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="0dp"
+    <!-- SearchView placed below Toolbar -->
+    <SearchView
+        android:id="@+id/searchView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search Notes..."
+        android:layout_marginTop="8dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:text="NoteMy"
-        android:textAlignment="textStart"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/design_default_color_on_primary"
-        android:textStyle="bold"
-        app:layout_constraintVertical_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/materialToolbar"
-        app:layout_constraintEnd_toEndOf="@+id/materialToolbar"
-        app:layout_constraintTop_toTopOf="@+id/materialToolbar"
-        app:layout_constraintBottom_toBottomOf="@+id/materialToolbar" />
+        android:background="?attr/selectableItemBackground" />
 
-    <!-- Centered Container with max width of 488dp -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/container"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+    <!-- NestedScrollView for scrolling content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="?attr/actionBarSize"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:maxWidth="488dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/materialToolbar"
-        app:layout_constraintBottom_toTopOf="@id/floating_action_button"
-        app:layout_constraintHorizontal_bias="0.5"> <!-- Center horizontally -->
+        android:layout_marginBottom="16dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- SearchView -->
-        <SearchView
-            android:id="@+id/searchView"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:iconifiedByDefault="false"
-            android:queryHint="Search Notes..."
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <androidx.core.widget.NestedScrollView
-            app:layout_constraintTop_toBottomOf="@+id/searchView"
+        <!-- Scrollable Content -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/scroll_layout"
+            android:paddingTop="16dp"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
-            <!-- TextView inside container -->
             <TextView
                 android:id="@+id/empty_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Empty..."
+                android:text="@string/empty"
                 android:textAlignment="center"
-                app:layout_constraintTop_toBottomOf="@+id/searchView"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent" />
 
-
+            <!-- Uncomment this RecyclerView if needed -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
-                android:layout_above="@+id/floating_action_button"
-                android:layout_below="@+id/empty_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:listitem="@layout/note_view_design" />
 
-        </androidx.core.widget.NestedScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- FloatingActionButton -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floating_action_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:clickable="true"
-        android:contentDescription="Create a new note"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        app:srcCompat="@android:drawable/ic_input_add"
+        android:contentDescription="@string/create_a_new_note" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
