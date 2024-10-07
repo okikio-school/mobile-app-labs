@@ -4,10 +4,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
-class NoteAdapter(private val itemList: MutableList<Map<String, Any>>) : RecyclerView.Adapter<NoteAdapter.MyViewHolder>() {
+class NoteAdapter(private var itemList: MutableList<Map<String, Any>>) : RecyclerView.Adapter<NoteAdapter.MyViewHolder>() {
 
     // ViewHolder class that holds reference to the item views
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -19,13 +18,13 @@ class NoteAdapter(private val itemList: MutableList<Map<String, Any>>) : Recycle
     // Inflate the layout for each item
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.note_view_design, parent, false)
-        Toast.makeText(parent.context, "onCreateViewHolder", Toast.LENGTH_SHORT).show()
         return MyViewHolder(view)
     }
 
     // Bind data to the item view
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val item = itemList[position]
+    override fun onBindViewHolder(holder: MyViewHolder, index: Int) {
+        println("Binding data for item at index $index: ${itemList[index]}")
+        val item = itemList[index]
         holder.title.text = item["title"].toString()
         holder.subtitle.text = item["subtitle"].toString()
         holder.description.text = item["description"].toString()
@@ -34,5 +33,11 @@ class NoteAdapter(private val itemList: MutableList<Map<String, Any>>) : Recycle
     // Return the number of items in the data list
     override fun getItemCount(): Int {
         return itemList.size
+    }
+
+    // Method to update the dataset
+    fun updateData(newItems: MutableList<Map<String, Any>>) {
+        itemList = newItems
+        notifyDataSetChanged() // This refreshes the RecyclerView with new data
     }
 }

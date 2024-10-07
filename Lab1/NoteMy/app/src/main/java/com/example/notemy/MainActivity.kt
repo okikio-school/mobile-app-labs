@@ -2,7 +2,7 @@ package com.example.notemy
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
+import android.widget.SearchView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -36,7 +36,6 @@ class MainActivity : AppCompatActivity() {
 
         // Get reference to the RecyclerView
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
-        val emptyView = findViewById<TextView>(R.id.empty_view)
 
         // Set up the adapter
         val adapter = NoteAdapter(dataList)
@@ -45,6 +44,57 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
+        val searchView = findViewById<SearchView>(R.id.searchView)
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                // Perform search when user submits the query
+                if (query != null) performSearch(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // Debounce search while the user types
+                if (newText != null) performSearch(newText)
+                return true
+            }
+        })
+
+        updateRecyclerView(dataList)
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+
+        val myDB = DatabaseHelper(this@MainActivity)
+        val searchView = findViewById<SearchView>(R.id.searchView)
+
+        val query = searchView.query
+        val dataList = (
+            if (query.isEmpty()) myDB.listData()
+            else myDB.searchData(query.toString())
+        );
+
+        updateRecyclerView(dataList)
+    }
+
+    private fun performSearch(query: String) {
+        val myDB = DatabaseHelper(this@MainActivity)
+        val searchResults = (
+            if (query.isEmpty()) myDB.listData()
+            else myDB.searchData(query)
+        );
+
+        updateRecyclerView(searchResults)
+    }
+
+    private fun updateRecyclerView(dataList: MutableList<Map<String, Any>>) {
+        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
+        val emptyView = findViewById<TextView>(R.id.empty_view)
+
+        val adapter = recyclerView.adapter as NoteAdapter
+        adapter.updateData(dataList)
+
         if (recyclerView.isEmpty()) {
             recyclerView.visibility = RecyclerView.GONE
             emptyView.visibility = TextView.VISIBLE
@@ -52,7 +102,6 @@ class MainActivity : AppCompatActivity() {
             recyclerView.visibility = RecyclerView.VISIBLE
             emptyView.visibility = TextView.GONE
         }
-
     }
 
     /**
