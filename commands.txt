@@ -1,0 +1,11 @@
+Compile the Server: javac FileInterface.java FileImpl.java FileServer.java 
+
+Compile the Client: javac FileInterface.java FileImpl.java  FileClient.java
+
+To solve version issue, compile with this command: javac -source 11 -target 11 FileInterface.java
+
+Start the RMI Registry: rmiregistry
+
+Run server: java "-Djava.security.policy=policy.txt" FileServer
+
+Run client: java FileClient fileName 127.0.0.1

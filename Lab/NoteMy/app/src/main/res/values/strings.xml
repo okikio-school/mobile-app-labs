@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">NoteMy</string>
+    <string name="blue">Blue</string>
+    <string name="deep_green">Deep Green</string>
+    <string name="Back">Back</string>
+    <string name="Save">Save</string>
+    <string name="title">NoteMy</string>
+    <string name="empty">Empty…</string>
+    <string name="create_a_new_note">Create a new note</string>
+    <string name="empty_note_title">Title</string>
+    <string name="empty_note_subtitle">Subtitle</string>
+    <string name="empty_note_description">Description</string>
+</resources>
