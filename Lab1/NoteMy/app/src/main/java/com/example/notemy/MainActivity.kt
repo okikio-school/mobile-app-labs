@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
+    private var initialDataList = mutableListOf<Map<String, Any>>()
+    private val adapter = NoteAdapter(initialDataList)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,15 +32,12 @@ class MainActivity : AppCompatActivity() {
             launch(NewNotesScreen::class.java)
         }
 
-        // Create an instance of the DatabaseHelper class
-        val myDB = DatabaseHelper(this@MainActivity)
-        val dataList = myDB.listData()
-
         // Get reference to the RecyclerView
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
 
-        // Set up the adapter
-        val adapter = NoteAdapter(dataList)
+        // Create an instance of the DatabaseHelper class
+        val myDB = DatabaseHelper(this@MainActivity)
+        val dataList = myDB.listData()
 
         // Attach the adapter and a layout manager to the RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -62,20 +61,12 @@ class MainActivity : AppCompatActivity() {
         updateRecyclerView(dataList)
     }
 
-
     override fun onResume() {
         super.onResume()
 
-        val myDB = DatabaseHelper(this@MainActivity)
         val searchView = findViewById<SearchView>(R.id.searchView)
-
         val query = searchView.query
-        val dataList = (
-            if (query.isEmpty()) myDB.listData()
-            else myDB.searchData(query.toString())
-        );
-
-        updateRecyclerView(dataList)
+        performSearch(query.toString())
     }
 
     private fun performSearch(query: String) {
@@ -88,14 +79,13 @@ class MainActivity : AppCompatActivity() {
         updateRecyclerView(searchResults)
     }
 
-    private fun updateRecyclerView(dataList: MutableList<Map<String, Any>>) {
+    private fun updateRecyclerView(data: MutableList<Map<String, Any>>) {
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
         val emptyView = findViewById<TextView>(R.id.empty_view)
 
-        val adapter = recyclerView.adapter as NoteAdapter
-        adapter.updateData(dataList)
+        adapter.updateData(data)
 
-        if (recyclerView.isEmpty()) {
+        if (adapter.itemCount <= 0) {
             recyclerView.visibility = RecyclerView.GONE
             emptyView.visibility = TextView.VISIBLE
         } else {

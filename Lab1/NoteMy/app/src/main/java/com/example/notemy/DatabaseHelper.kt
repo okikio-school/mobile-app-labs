@@ -65,6 +65,8 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAM
     }
 
     fun insertData(title: String, subtitle: String, description: String, color: String): Boolean {
+        if (title.isEmpty()) return false;
+
         val db = writableDatabase;
         val values = ContentValues();
         values.put(COL_2, title);

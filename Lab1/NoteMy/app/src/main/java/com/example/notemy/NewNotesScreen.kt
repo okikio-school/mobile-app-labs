@@ -50,6 +50,7 @@ class NewNotesScreen : AppCompatActivity() {
                 currentColor = "blue"
             }
         }
+
         deepGreenBtn.setOnClickListener{
             if (currentColor == "deep green"){
                 currentColor = "white"
@@ -61,6 +62,7 @@ class NewNotesScreen : AppCompatActivity() {
                 currentColor = "deep green"
             }
         }
+
         pastelPink.setOnClickListener{
             if (currentColor == "pastel pink"){
                 currentColor = "white"
@@ -92,7 +94,7 @@ class NewNotesScreen : AppCompatActivity() {
             val toastMsg = if (isInserted) "Data Inserted" else "Something went Wrong";
             Toast.makeText(this@NewNotesScreen, toastMsg, Toast.LENGTH_SHORT).show();
 
-            launch(MainActivity::class.java)
+            if (isInserted) launch(MainActivity::class.java)
         }
     }
 
