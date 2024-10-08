@@ -39,7 +39,9 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAM
 
     // Search query using the MATCH operator to perform full-text search
     fun searchData(queryString: String): MutableList<Map<String, Any>> {
-        return query("SELECT $HIDDEN_COL as $COL_1, * FROM $TABLE_NAME WHERE $TABLE_NAME MATCH ?", arrayOf(queryString))
+        val fetchQuery = "%$queryString%"
+        return query("SELECT $HIDDEN_COL as $COL_1, * FROM $TABLE_NAME WHERE $COL_2 LIKE ? OR $COL_3 LIKE ? OR $COL_4 LIKE ?",
+            arrayOf(fetchQuery, fetchQuery, fetchQuery))
     }
 
     private fun query(query: String, params: Array<String> = emptyArray()): MutableList<Map<String, Any>> {

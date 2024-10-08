@@ -42,7 +42,9 @@ class NoteAdapter(private var itemList: MutableList<Map<String, Any>>) : Recycle
 
         // Get the color from the map using the item's "color" value
         val colorKey = item["color"].toString()
-        val colorResId = colorMap[colorKey] ?: R.color.white  // Default to white if no match
+        val colorResId = if (colorKey.isNotEmpty() && colorMap.containsKey(colorKey)) {
+            colorMap[colorKey] ?: R.color.white
+        } else R.color.white  // Default to white if no match
 
         // Use the correct context
         val color = ContextCompat.getColor(holder.itemView.context, colorResId)
