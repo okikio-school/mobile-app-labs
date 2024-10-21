@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
+import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -48,6 +49,19 @@ class  ViewNote : AppCompatActivity() {
 
             intent.putExtras(options)
             startActivity(intent)
+        }
+
+        binding.deleteFab.setOnClickListener { view ->
+            val databaseHelper = DatabaseHelper(this)
+            val isDeleted = databaseHelper.deleteData(id.toString())
+
+            val toastMsg = if (isDeleted) "Note deleted" else "Something went Wrong";
+            Toast.makeText(view.context, toastMsg, Toast.LENGTH_SHORT).show();
+
+            if (isDeleted) {
+                launch(MainActivity::class.java)
+                id = -1
+            }
         }
     }
 
@@ -97,5 +111,16 @@ class  ViewNote : AppCompatActivity() {
         } else {
             binding.contentScrolling.noteDescription?.setTextColor(Color.BLACK)
         }
+    }
+
+    /**
+     * Method to switch to a specified activity
+     * @param activityClass the activity class to launch
+     */
+    private fun launch(activityClass: Class<*>) {
+        // Create an Intent to start the specified activity
+        val intent = Intent(this, activityClass)
+        // Start the new activity
+        startActivity(intent)
     }
 }

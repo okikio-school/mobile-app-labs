@@ -81,7 +81,7 @@ class NewNotesScreen : AppCompatActivity() {
         val mainNote = findViewById<EditText>(R.id.descriptionMultiLine)
 
         val saveBtn = findViewById<Button>(R.id.save_btn);
-        saveBtn.setOnClickListener {
+        saveBtn.setOnClickListener { view ->
             val myDB = DatabaseHelper(this@NewNotesScreen)
             val isInserted = if (id > 0)
                 myDB.updateData(
@@ -100,8 +100,8 @@ class NewNotesScreen : AppCompatActivity() {
                 )
             }
 
-            val toastMsg = if (isInserted) "Data Inserted" else "Something went Wrong";
-            Toast.makeText(this@NewNotesScreen, toastMsg, Toast.LENGTH_SHORT).show();
+            val toastMsg = if (isInserted) "Note Inserted" else "Something went Wrong";
+            Toast.makeText(view.context, toastMsg, Toast.LENGTH_SHORT).show();
 
             if (isInserted) {
                 if (id > 0) {

@@ -91,7 +91,13 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAM
         values.put(COL_5, color);
 
         val insertion = db.update(TABLE_NAME, values, "$HIDDEN_COL = ?", arrayOf(id));
-        return insertion != -1;
+        return insertion > 0;
+    }
+
+    fun deleteData(id: String): Boolean {
+        val db = writableDatabase;
+        val deletion = db.delete(TABLE_NAME, "$HIDDEN_COL = ?", arrayOf(id));
+        return deletion > 0;
     }
 
 }
