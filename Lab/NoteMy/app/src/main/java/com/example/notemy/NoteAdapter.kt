@@ -1,15 +1,25 @@
 package com.example.notemy
 
+import android.content.Intent
 import android.graphics.Color
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.notemy.databinding.ActivityViewNoteBinding
 
 class NoteAdapter(private var itemList: MutableList<Map<String, Any>>) : RecyclerView.Adapter<NoteAdapter.MyViewHolder>() {
+    private val colorMap = mapOf(
+        "white" to R.color.white,
+        "blue" to R.color.blue,
+        "pastel pink" to R.color.pastel_pink,
+        "deep green" to R.color.deep_green,
+    )
 
     // ViewHolder class that holds reference to the item views
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -33,24 +43,42 @@ class NoteAdapter(private var itemList: MutableList<Map<String, Any>>) : Recycle
         holder.subtitle.text = item["subtitle"].toString()
         holder.description.text = item["description"].toString()
 
-        val colorMap = mapOf(
-            "white" to R.color.white,
-            "blue" to R.color.blue,
-            "pastel pink" to R.color.pastel_pink,
-            "deep green" to R.color.deep_green,
-        )
-
         // Get the color from the map using the item's "color" value
         val colorKey = item["color"].toString()
-        val colorResId = if (colorKey.isNotEmpty() && colorMap.containsKey(colorKey)) {
-            colorMap[colorKey] ?: R.color.white
+        setColor(colorKey, holder)
+
+        holder.card.setOnClickListener { v ->
+            val intent = Intent(v.context, ViewNote::class.java)
+            val options = Bundle().apply {
+                putInt("id", Integer.parseInt(item["id"].toString()))
+            }
+
+            // Attach the options to the intent as extras
+            intent.putExtras(options)
+
+            startActivity(v.context, intent, null)
+        }
+    }
+
+    private fun setColor(color: String, holder: NoteAdapter.MyViewHolder) {
+        val colorResId = if (color.isNotEmpty() && colorMap.containsKey(color)) {
+            colorMap[color] ?: R.color.white
         } else R.color.white  // Default to white if no match
 
         // Use the correct context
-        val color = ContextCompat.getColor(holder.itemView.context, colorResId)
-
+        val colorRes = ContextCompat.getColor(holder.itemView.context, colorResId)
         // Set the card background color
-        holder.card.setCardBackgroundColor(color)
+        holder.card.setCardBackgroundColor(colorRes)
+
+        if (color == "deep green") {
+            holder.title.setTextColor(Color.WHITE)
+            holder.subtitle.setTextColor(Color.WHITE)
+            holder.description.setTextColor(Color.WHITE)
+        } else {
+            holder.title.setTextColor(Color.BLACK)
+            holder.subtitle.setTextColor(Color.BLACK)
+            holder.description.setTextColor(Color.BLACK)
+        }
     }
 
     // Return the number of items in the data list

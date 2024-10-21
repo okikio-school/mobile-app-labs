@@ -12,6 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NoteMy">
         <activity
+            android:name=".ViewNote"
+            android:exported="false"
+            android:label="@string/title_activity_viewing_note"
+            android:theme="@style/Theme.NoteMy.NoActionBar" />
+        <activity
             android:name=".Note"
             android:exported="false" />
         <activity

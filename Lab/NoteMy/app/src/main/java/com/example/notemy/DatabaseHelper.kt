@@ -80,4 +80,18 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAM
         return insertion != -1L;
     }
 
+    fun updateData(id: String, title: String, subtitle: String, description: String, color: String): Boolean {
+        if (title.isEmpty()) return false;
+
+        val db = writableDatabase;
+        val values = ContentValues();
+        values.put(COL_2, title);
+        values.put(COL_3, subtitle);
+        values.put(COL_4, description);
+        values.put(COL_5, color);
+
+        val insertion = db.update(TABLE_NAME, values, "$HIDDEN_COL = ?", arrayOf(id));
+        return insertion != -1;
+    }
+
 }
