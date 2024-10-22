@@ -2,6 +2,7 @@ package com.example.notemy
 
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
@@ -79,8 +80,16 @@ class  ViewNote : AppCompatActivity() {
         val data = if (id > 0) databaseHelper.getData(id.toString()) else null;
 
         // Use the values from the bundle
-        binding.toolbarLayout.title = (extras?.getString("title") ?: data?.get(0)?.get("title") ?: "Empty Note Title").toString()
+        binding.toolbar.title = (extras?.getString("title") ?: data?.get(0)?.get("title") ?: "Empty Note Title").toString()
         binding.toolbar.subtitle = (extras?.getString("subtitle") ?: data?.get(0)?.get("subtitle") ?: "Empty Note Subtitle").toString()
+
+        val imageRef = extras?.getString("image") ?: data?.get(0)?.get("image")
+        val imageString = imageRef.toString()
+        if (imageRef != null && imageString.isNotEmpty() && imageString != "null") {
+            val image = binding.contentScrolling.noteImage
+            image?.setImageURI(Uri.parse(imageString))
+//            image?.setImageBitmap()
+        }
 
         // Get the color from the map using the item's "color" value
         val colorKey = (extras?.getString("color") ?: data?.get(0)?.get("color")).toString()

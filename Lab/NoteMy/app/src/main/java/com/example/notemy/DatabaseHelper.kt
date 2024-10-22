@@ -68,8 +68,8 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAM
         return notesRecord
     }
 
-    fun insertData(title: String, subtitle: String, description: String, color: String, image: String? = null): Boolean {
-        if (title.isEmpty()) return false;
+    fun insertData(title: String, subtitle: String, description: String, color: String, image: String? = null): Long {
+        if (title.isEmpty()) return -1L;
 
         val db = writableDatabase;
         val values = ContentValues();
@@ -83,7 +83,7 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAM
         }
 
         val insertion = db.insert(TABLE_NAME, null, values);
-        return insertion != -1L;
+        return insertion;
     }
 
     fun updateData(id: String, title: String, subtitle: String, description: String, color: String): Boolean {

@@ -30,9 +30,7 @@ class NewNotesScreen : AppCompatActivity() {
         "deep green" to R.color.deep_green,
     )
 
-    private var currentTitle: String? = null
-    private var currentSubtitle: String? = null
-    private var currentDescription: String? = null
+    private var currentImageUri: String? = null
     private var currentColor = "white"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,7 +92,7 @@ class NewNotesScreen : AppCompatActivity() {
         val saveBtn = findViewById<Button>(R.id.save_btn)
         saveBtn.setOnClickListener { view ->
             val myDB = DatabaseHelper(this@NewNotesScreen)
-            val isInserted = if (id > 0)
+            val isUpdated = if (id > 0) {
                 myDB.updateData(
                     id.toString(),
                     textTitle.text.toString(),
@@ -102,20 +100,26 @@ class NewNotesScreen : AppCompatActivity() {
                     mainNote.text.toString(),
                     currentColor
                 )
-            else {
-                    myDB.insertData(
+            } else false
+            val isInserted = if (id <= 0) {
+                myDB.insertData(
                     textTitle.text.toString(),
                     textSubTitle.text.toString(),
                     mainNote.text.toString(),
-                    currentColor
+                    currentColor,
+                    currentImageUri
                 )
+            } else -1L
+
+            if (isUpdated) {
+                myDB.updateImage(id.toString(), currentImageUri.toString())
             }
 
-            val toastMsg = if (isInserted) "Note Inserted" else "Something went Wrong"
+            val toastMsg = if (isInserted > -1L || isUpdated) "Note Inserted" else "Something went Wrong"
             Toast.makeText(view.context, toastMsg, Toast.LENGTH_SHORT).show()
 
-            if (isInserted) {
-                if (id > 0) {
+            if (isInserted > -1L || isUpdated) {
+                if (isUpdated) {
                     onBackPressedDispatcher.onBackPressed()
                 } else {
                     launch(MainActivity::class.java)
@@ -136,19 +140,31 @@ class NewNotesScreen : AppCompatActivity() {
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK && result.data != null) {
-            val myDB = DatabaseHelper(this@NewNotesScreen)
-
             // Handle the result
             val imageUri = result.data?.data
             println("Image Intent Result: $result; Image URI: $imageUri")
-            // Save the image URI to the database
-            myDB.updateImage(id.toString(), imageUri.toString())
 
-            updateNoteData()
+            if (imageUri != null) {
+                currentImageUri = imageUri.toString()
 
-            val imageView = findViewById<ImageView>(R.id.imageView)
-            imageView.setImageURI(Uri.parse(imageUri.toString()))
+                updateNoteData()
+
+                // Persist the permission to access the URI
+                grantUriPermission(imageUri)
+
+                val imageView = findViewById<ImageView>(R.id.imageView)
+                imageView.setImageURI(Uri.parse(currentImageUri))
+            }
         }
+    }
+
+
+    private fun grantUriPermission(uri: Uri) {
+        // Get the flags from the intent
+        val flags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+
+        // Request permission for the content URI (persistable)
+        contentResolver.takePersistableUriPermission(uri, flags)
     }
 
     // Save the instance state
@@ -196,7 +212,8 @@ class NewNotesScreen : AppCompatActivity() {
             val title = data[0]["title"].toString()
             val subtitle = data[0]["subtitle"].toString()
             val description = data[0]["description"].toString()
-            val image = data[0]["image"].toString()
+            val image = data[0]["image"] ?: null
+            val imageString = image.toString()
 
             textTitle.setText(title)
             textSubTitle.setText(subtitle)
@@ -207,8 +224,12 @@ class NewNotesScreen : AppCompatActivity() {
             val colorKey = data[0]["color"].toString()
             setColor(colorKey)
 
-            if (image.isNotEmpty()) {
-                imageView.setImageURI(Uri.parse(image))
+
+            println("NewNoteScreen UpdateNoteData Image URI: $image")
+            println("NewNoteScreen UpdateNoteData Current Image URI: $currentImageUri")
+            if (image != null && imageString.isNotEmpty() && imageString != "null") {
+                imageView.setImageURI(Uri.parse(imageString))
+                currentImageUri = imageString
             }
         } else if (instanceState != null && instanceState.containsKey("title")) {
             textTitle.setText(instanceState.getString("title"))
@@ -223,6 +244,7 @@ class NewNotesScreen : AppCompatActivity() {
             textView3.text = "New Note Screen"
             setColor("white")
             imageView.setImageResource(R.drawable.ic_launcher_background)
+            currentImageUri = null
         }
     }
 

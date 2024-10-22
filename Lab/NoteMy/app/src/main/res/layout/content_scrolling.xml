@@ -8,11 +8,21 @@
     tools:context=".ViewNote"
     tools:showIn="@layout/activity_view_note">
 
-    <TextView
-        android:id="@+id/noteDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:text="@string/large_text" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/noteDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:text="@string/large_text" />
+
+        <ImageView
+            android:id="@+id/noteImage"
+            android:layout_width="128dp"
+            android:layout_height="128dp" />
+    </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>
