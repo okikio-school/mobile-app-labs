@@ -15,13 +15,14 @@ private const val COL_2 = "TITLE"
 private const val COL_3 = "SUBTITLE"
 private const val COL_4 = "DESCRIPTION"
 private const val COL_5 = "COLOR"
+private const val COL_6 = "IMAGE"
 
-class DatabaseHelper(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, null, 1) {
+class DatabaseHelper(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAME, null, 2) {
     override fun onCreate(db: SQLiteDatabase) {
         // Create a virtual table to store the data required for full-text search
         // Note: virtual tables only support TEXT data types for columns,
         // in addition to the `rowid` column which acts as an autoincrement primary key integer
-        db.execSQL("CREATE VIRTUAL TABLE IF NOT EXISTS $TABLE_NAME USING fts4($COL_2, $COL_3, $COL_4, $COL_5)");
+        db.execSQL("CREATE VIRTUAL TABLE IF NOT EXISTS $TABLE_NAME USING fts4($COL_2, $COL_3, $COL_4, $COL_5, $COL_6)");
     }
 
     override fun onUpgrade(db: SQLiteDatabase, old: Int, new: Int) {
@@ -56,7 +57,8 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAM
                     "title" to cursor.getString(cursor.getColumnIndexOrThrow(COL_2)),
                     "subtitle" to cursor.getString(cursor.getColumnIndexOrThrow(COL_3)),
                     "description" to cursor.getString(cursor.getColumnIndexOrThrow(COL_4)),
-                    "color" to cursor.getString(cursor.getColumnIndexOrThrow(COL_5))
+                    "color" to cursor.getString(cursor.getColumnIndexOrThrow(COL_5)),
+                    "image" to cursor.getString(cursor.getColumnIndexOrThrow(COL_6))
                 )
                 notesRecord.add(note)
             } while (cursor.moveToNext())
@@ -66,7 +68,7 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAM
         return notesRecord
     }
 
-    fun insertData(title: String, subtitle: String, description: String, color: String): Boolean {
+    fun insertData(title: String, subtitle: String, description: String, color: String, image: String? = null): Boolean {
         if (title.isEmpty()) return false;
 
         val db = writableDatabase;
@@ -75,6 +77,10 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAM
         values.put(COL_3, subtitle);
         values.put(COL_4, description);
         values.put(COL_5, color);
+
+        if (!image.isNullOrEmpty()) {
+            values.put(COL_6, image);
+        }
 
         val insertion = db.insert(TABLE_NAME, null, values);
         return insertion != -1L;
@@ -89,6 +95,26 @@ class DatabaseHelper(context: Context?) : SQLiteOpenHelper(context, DATABASE_NAM
         values.put(COL_3, subtitle);
         values.put(COL_4, description);
         values.put(COL_5, color);
+
+        val insertion = db.update(TABLE_NAME, values, "$HIDDEN_COL = ?", arrayOf(id));
+        return insertion > 0;
+    }
+
+    fun updateImage(id: String, image: String? = null): Boolean {
+        val db = writableDatabase;
+        val values = ContentValues();
+        if (!image.isNullOrEmpty()) {
+            values.put(COL_6, image);
+        }
+
+        val insertion = db.update(TABLE_NAME, values, "$HIDDEN_COL = ?", arrayOf(id));
+        return insertion > 0;
+    }
+
+    fun deleteImage(id: String): Boolean {
+        val db = writableDatabase;
+        val values = ContentValues();
+        values.put(COL_6, "");
 
         val insertion = db.update(TABLE_NAME, values, "$HIDDEN_COL = ?", arrayOf(id));
         return insertion > 0;

@@ -1,12 +1,16 @@
 package com.example.notemy
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.TextView
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
@@ -58,6 +62,53 @@ class NoteAdapter(private var itemList: MutableList<Map<String, Any>>) : Recycle
 
             startActivity(v.context, intent, null)
         }
+
+        // Add popup menu to the card
+        holder.card.setOnLongClickListener { v ->
+            showPopupMenu(v, Integer.parseInt(item["id"].toString()))
+            true
+        }
+    }
+
+    // Method to create and show the popup menu
+    private fun showPopupMenu(view: View, id: Int) {
+        val popup = PopupMenu(view.context, view)
+
+        // Add menu items programmatically with IDs
+        popup.menu.add(0, 1, 0, "Edit")    // Group ID: 0, Item ID: 1, Order: 0, Title: "Edit"
+        popup.menu.add(0, 2, 1, "Delete")  // Group ID: 0, Item ID: 2, Order: 1, Title: "Delete"
+
+        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+            println("Menu item clicked: ${menuItem.itemId}")
+            when (menuItem.itemId) {
+                1 -> {
+                    val intent = Intent(view.context, NewNotesScreen::class.java)
+                    val options = Bundle().apply {
+                        putInt("id", id)
+                    }
+                    intent.putExtras(options)
+                    startActivity(view.context, intent, null)
+
+                    Toast.makeText(view.context, "Edit clicked", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                2 -> {
+                    val databaseHelper = DatabaseHelper(view.context)
+                    val isDeleted = databaseHelper.deleteData(id.toString())
+
+                    val toastMsg = if (isDeleted) "Note deleted" else "Something went Wrong";
+                    Toast.makeText(view.context, toastMsg, Toast.LENGTH_SHORT).show();
+
+                    if (isDeleted) {
+                        launch(view.context, MainActivity::class.java)
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
+
+        popup.show()
     }
 
     private fun setColor(color: String, holder: NoteAdapter.MyViewHolder) {
@@ -84,6 +135,17 @@ class NoteAdapter(private var itemList: MutableList<Map<String, Any>>) : Recycle
     // Return the number of items in the data list
     override fun getItemCount(): Int {
         return itemList.size
+    }
+
+    /**
+     * Method to switch to a specified activity
+     * @param activityClass the activity class to launch
+     */
+    private fun launch(context: Context, activityClass: Class<*>) {
+        // Create an Intent to start the specified activity
+        val intent = Intent(context, activityClass)
+        // Start the new activity
+        startActivity(context, intent, null)
     }
 
     // Method to update the dataset
