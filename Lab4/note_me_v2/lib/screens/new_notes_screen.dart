@@ -1,6 +1,6 @@
-
+import 'dart:io';
 import 'package:flutter/material.dart';
-
+import 'package:image_picker/image_picker.dart';
 import '../models/note_model.dart';
 import '../services/database_service.dart';
 
@@ -17,6 +17,18 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
   final titleController = TextEditingController();
   final contentController = TextEditingController();
   Color selectedColor = Colors.transparent;
+  String? imagePath;
+
+  Future<void> pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedFile =
+    await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        imagePath = pickedFile.path;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,22 +36,46 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
       appBar: AppBar(
         title: const Text('New Note'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
-          children: [
-            TextFormField(
-              controller: titleController,
-              style: const TextStyle(fontSize: 28),
-              decoration: const InputDecoration(
-                  border: InputBorder.none, hintText: "Title"),
-            ),
-            TextFormField(
-                controller: contentController,
-                style: const TextStyle(fontSize: 18),
+      body: Container(
+        color: selectedColor,
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            children: [
+              TextFormField(
+                controller: titleController,
+                style: const TextStyle(fontSize: 28),
                 decoration: const InputDecoration(
-                    border: InputBorder.none, hintText: "Note")),
-            const SizedBox(height: 50),
+                    border: InputBorder.none, hintText: "Title"),
+              ),
+              TextFormField(
+                  controller: contentController,
+                  minLines: 5,
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  style: const TextStyle(fontSize: 18),
+                  decoration: const InputDecoration(
+                      border: InputBorder.none, hintText: "Note")),
+              const SizedBox(height: 50),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  if (imagePath != null)
+                    Image.file(
+                      File(imagePath!),
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+      persistentFooterButtons: [
+        Row(
+          children: [
             Row(
               children: [
                 GestureDetector(
@@ -69,8 +105,8 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
                               onTap: () =>
                                   Navigator.pop(context, color),
                               child: Container(
-                                width: 24,
-                                height: 24,
+                                width: 25,
+                                height: 25,
                                 decoration: BoxDecoration(
                                   color: color,
                                   borderRadius:
@@ -89,12 +125,16 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
                   },
                   child: Row(
                     children: [
-                      Text('Pick a color: '),
+                      Icon(Icons.colorize),
                       Container(
-                        width: 24,
-                        height: 24,
+                        width: 25,
+                        height: 25,
                         decoration: BoxDecoration(
                           color: selectedColor,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 2,
+                          ),
                           borderRadius: BorderRadius.circular(50),
                         ),
                       ),
@@ -103,10 +143,13 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            IconButton(
+              icon: const Icon(Icons.add_a_photo),
+              onPressed: pickImage,
+            ),
           ],
-        ),
-      ),
+        )
+      ],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Check if the title or content is empty
@@ -123,6 +166,7 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
             title: titleController.text,
             content: contentController.text,
             color: selectedColor.value,
+            image: imagePath,
           );
 
           // Save the note to the database and await the operation
@@ -130,7 +174,7 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
             note.title,
             note.content,
             note.color,
-            null,
+            imagePath,
           );
 
           // Notify HomeScreen and close the NewNotesScreen

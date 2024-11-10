@@ -14,7 +14,7 @@ class NoteMe extends StatelessWidget {
       title: 'NoteMe',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.red,
+          seedColor: Colors.teal,
           brightness: Brightness.dark,
         ),
       ),

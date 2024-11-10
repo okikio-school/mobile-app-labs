@@ -1,5 +1,3 @@
-
-
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -16,6 +14,7 @@ class DatabaseService {
   final String _notesTitle = "TITLE";
   final String _notesContent = "CONTENT";
   final String _notesColor = "COLOR";
+  final String _notesImage = "IMAGE";
 
   Future<Database> get database async {
     if (_db != null) {
@@ -38,13 +37,13 @@ class DatabaseService {
               $_notesTitle TEXT,
               $_notesContent TEXT,
               $_notesColor INTEGER,
-              IMAGE TEXT
+              $_notesImage TEXT
             )
           ''';
         db.execute(createTable);
       },
       onUpgrade: (db, oldVersion, newVersion) {
-        if (oldVersion < 2) {
+        if (oldVersion < 3) {
           db.execute("ALTER TABLE notes ADD COLUMN IMAGE TEXT");
         }
       },
@@ -71,8 +70,13 @@ class DatabaseService {
     });
   }
 
-  Future<void> updateNote(int id, String title, String content, int color,
-      String? imagePath) async {
+  Future<void> updateNote(
+      int id,
+      String title,
+      String content,
+      int color,
+      String? imagePath,
+      ) async {
     final db = await database;
     await db.update(
       _notesTableName,
@@ -80,7 +84,7 @@ class DatabaseService {
         _notesTitle: title,
         _notesContent: content,
         _notesColor: color,
-        'IMAGE': imagePath,
+        _notesImage: imagePath,
       },
       where: '$_notesId = ?',
       whereArgs: [id],

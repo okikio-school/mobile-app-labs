@@ -1,12 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:note_me_v2/services/database_service.dart';
-
 import '../models/note_model.dart';
-
-
 
 class NoteView extends StatefulWidget {
   const NoteView({
@@ -17,8 +13,8 @@ class NoteView extends StatefulWidget {
   });
 
   final Note note;
-  final VoidCallback onNoteUpdated;
-  final VoidCallback onNoteDeleted;
+  final Function(Note) onNoteUpdated;
+  final Function(Note) onNoteDeleted;
 
   @override
   State<NoteView> createState() => _NoteViewState();
@@ -50,24 +46,6 @@ class _NoteViewState extends State<NoteView> {
     }
   }
 
-  Future<void> saveNote() async {
-    await DatabaseService.instance.updateNote(
-      widget.note.id!,
-      titleController.text,
-      contentController.text,
-      selectedColor.value,
-      imagePath,
-    );
-    widget.onNoteUpdated(); // Notify home screen
-    Navigator.pop(context);
-  }
-
-  Future<void> deleteNote() async {
-    await DatabaseService.instance.deleteNoteById(widget.note.id!);
-    widget.onNoteDeleted(); // Notify home screen
-    Navigator.pop(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,8 +70,12 @@ class _NoteViewState extends State<NoteView> {
                           TextButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
-                                widget.onNoteDeleted();
-                                Navigator.of(context).pop();
+                                DatabaseService.instance
+                                    .deleteNoteById(widget.note.id!);
+                                widget.onNoteDeleted(widget.note);
+                                if (Navigator.of(context).canPop()) {
+                                  Navigator.of(context).pop();
+                                }
                               },
                               child: const Text("Delete")),
                         ],
@@ -103,26 +85,49 @@ class _NoteViewState extends State<NoteView> {
               icon: const Icon(Icons.delete))
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Column(
+      body: Container(
+        color: selectedColor,
+        child: Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: Column(
+            children: [
+              TextFormField(
+                controller: titleController,
+                style: const TextStyle(fontSize: 28),
+                decoration: const InputDecoration(
+                    border: InputBorder.none, hintText: "Title"),
+              ),
+              TextFormField(
+                controller: contentController,
+                minLines: 5,
+                maxLines: null,
+                keyboardType: TextInputType.multiline,
+                style: const TextStyle(fontSize: 18),
+                decoration: const InputDecoration(
+                    border: InputBorder.none, hintText: "Note"),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  if (imagePath != null)
+                    Image.file(
+                      File(imagePath!),
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+      persistentFooterButtons: [
+        Row(
           children: [
-            TextFormField(
-              controller: titleController,
-              style: const TextStyle(fontSize: 28),
-              decoration: const InputDecoration(
-                  border: InputBorder.none, hintText: "Title"),
-            ),
-            TextFormField(
-              controller: contentController,
-              style: const TextStyle(fontSize: 18),
-              decoration: const InputDecoration(
-                  border: InputBorder.none, hintText: "Note"),
-            ),
-            const SizedBox(height: 20),
             Row(
               children: [
-                const Text('Pick a color: '),
+                const Icon(Icons.colorize),
                 GestureDetector(
                   onTap: () async {
                     Color? color = await showDialog(
@@ -144,16 +149,17 @@ class _NoteViewState extends State<NoteView> {
                               Colors.amber,
                               Colors.lightBlue,
                               Colors.lightGreen,
-                              Colors.blueGrey
+                              Colors.blueGrey,
                             ]
                                 .map((color) => GestureDetector(
                               onTap: () =>
                                   Navigator.pop(context, color),
                               child: Container(
-                                width: 24,
-                                height: 24,
+                                width: 25,
+                                height: 25,
                                 decoration: BoxDecoration(
                                   color: color,
+                                  border: Border.all(),
                                   borderRadius:
                                   BorderRadius.circular(50),
                                 ),
@@ -169,35 +175,60 @@ class _NoteViewState extends State<NoteView> {
                     }
                   },
                   child: Container(
-                    width: 24,
-                    height: 24,
-                    color: selectedColor,
+                    width: 25,
+                    height: 25,
+                    decoration: BoxDecoration(
+                        color: selectedColor,
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(50)),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                if (imagePath != null)
-                  Image.file(
-                    File(imagePath!),
-                    width: 100,
-                    height: 100,
-                  ),
-                IconButton(
-                  icon: const Icon(Icons.add_a_photo),
-                  onPressed: pickImage,
-                ),
-              ],
+            IconButton(
+              icon: const Icon(Icons.add_a_photo),
+              onPressed: pickImage,
             ),
           ],
-        ),
-      ),
+        )
+      ],
       floatingActionButton: FloatingActionButton(
           onPressed: () {
-            widget.onNoteUpdated();
-            Navigator.of(context).pop();
+            // Check if the title or content is empty
+            if (titleController.text.isEmpty &&
+                contentController.text.isEmpty) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text("Title or content must be provided.")),
+              );
+              return;
+            }
+
+            // Create the note object
+            final note = Note(
+              title: titleController.text,
+              content: contentController.text,
+              color: selectedColor.value,
+              image: imagePath,
+            );
+
+            // Save the note to the database and await the operation
+            DatabaseService.instance.updateNote(
+              widget.note.id!,
+              titleController.text,
+              contentController.text,
+              selectedColor.value,
+              imagePath,
+            );
+
+            // Notify HomeScreen and close the NewNotesScreen
+            widget.onNoteUpdated(note);
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
           },
           child: Icon(Icons.save)),
     );

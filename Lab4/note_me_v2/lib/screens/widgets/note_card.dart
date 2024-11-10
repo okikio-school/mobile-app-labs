@@ -11,11 +11,13 @@ class NoteCard extends StatelessWidget {
       {super.key,
         required this.note,
         required this.index,
+        required this.onNoteUpdated,
         required this.onNoteDeleted});
 
   final Note note;
   final int index;
-  final Function(int) onNoteDeleted;
+  final Function(Note) onNoteUpdated;
+  final Function(Note) onNoteDeleted;
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +26,12 @@ class NoteCard extends StatelessWidget {
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => NoteView(
             note: note,
-            onNoteUpdated: () {
+            onNoteUpdated: (updatedNote) {
+              onNoteUpdated(updatedNote); // Pass the updated note back
               Navigator.of(context).pop();
             },
-            onNoteDeleted: () {
-              onNoteDeleted(index);
+            onNoteDeleted: (deletedNote) {
+              onNoteDeleted(deletedNote); // Pass the deleted note back
               Navigator.of(context).pop();
             },
           ),
@@ -71,15 +74,5 @@ class NoteCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  // Helper method to convert color from string
-  Color _colorFromString(String colorString) {
-    try {
-      return Color(
-          int.parse(colorString.replaceAll('Color(', '').replaceAll(')', '')));
-    } catch (e) {
-      return Colors.transparent; // Default color if parsing fails
-    }
   }
 }

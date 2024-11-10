@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:note_me_v2/screens/widgets/note_card.dart';
-
 import '../models/note_model.dart';
 import '../services/database_service.dart';
 import 'new_notes_screen.dart';
@@ -74,15 +73,24 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         )
-            : ListView.builder(
-          itemCount: notes.length,
-          itemBuilder: (context, index) {
-            return NoteCard(
-              note: notes[index],
-              index: index,
-              onNoteDeleted: onNoteDeleted,
-            );
-          },
+            : Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: ListView.builder(
+            itemCount: notes.length,
+            itemBuilder: (context, index) {
+              return NoteCard(
+                note: notes[index],
+                index: index,
+                onNoteUpdated: (updatedNote) async {
+                  await fetchNotes();
+                },
+                onNoteDeleted: (deletedNote) async {
+                  await _databaseService.deleteNoteById(deletedNote.id);
+                  await fetchNotes();
+                },
+              );
+            },
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -99,9 +107,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void onNoteDeleted(int index) async {
-    final note = notes[index];
-    await _databaseService.deleteNoteById(note.id);
-    await fetchNotes(); // Reload notes after deletion
+  void onNoteDeleted(Note deletedNote) {
+    setState(() {
+      notes.removeWhere((note) => note.id == deletedNote.id);
+    });
+    _databaseService.deleteNoteById(deletedNote.id!);
   }
 }
