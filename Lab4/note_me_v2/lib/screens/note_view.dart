@@ -137,6 +137,7 @@ class _NoteViewState extends State<NoteView> {
                         content: SingleChildScrollView(
                           child: Wrap(
                             spacing: 10,
+                            runSpacing: 10,
                             children: [
                               Colors.red,
                               Colors.green,

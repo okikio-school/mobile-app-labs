@@ -87,6 +87,7 @@ class _NewNotesScreenState extends State<NewNotesScreen> {
                         content: SingleChildScrollView(
                           child: Wrap(
                             spacing: 10,
+                            runSpacing: 10,
                             children: [
                               Colors.red,
                               Colors.green,
