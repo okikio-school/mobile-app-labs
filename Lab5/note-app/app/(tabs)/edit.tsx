@@ -1,70 +1,103 @@
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
+import { useNotes, type Note } from "@/db/note";
 
-import { FlatList, StatusBar, StyleSheet, Text, TextInput, View } from "react-native";
+import { ThemedText } from "@/components/ThemedText";
+import { ThemedButton } from "@/components/ThemedButton";
+
+import { useEffect, useState } from "react";
+import { StatusBar, StyleSheet, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { Storage } from "expo-sqlite/kv-store";
-import { useEffect, useState } from "react";
-import { Note } from "@/db/note";
-import { Card } from "@/components/Card";
 import { ThemedInput } from "@/components/ThemedInput";
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import { MaterialIcons } from "@expo/vector-icons";
 import { useThemeColor } from "@/hooks/useThemeColor";
+import { router, Stack } from "expo-router";
+import Toast from "react-native-root-toast";
 
 export default function NewNoteScreen() {
   const textColor = useThemeColor({  }, 'text');
-  const [noteList, setNoteList] = useState<Note[]>([
-    {
-      id: "1",
-      title: "Hello World",
-      subtitle: "This is a subtitle",
-      description: "This is a description",
-      color: "lightblue",
-    }
-  ]);
+
+  const [title, onChangeTitle] = useState('');
+  const [subtitle, onChangeSubtitle] = useState('');
+  const [description, onChangeDescription] = useState('');
+
   
-  const [text, onChangeText] = useState('Useless Text');
+  const { state, dispatch } = useNotes();
+  const noteList = state.notes;
 
-  useEffect(() => {
-    // Storage.getItemAsync("notes").then((data) => {
-    //   if (data === null) return;
+  const saveNote = async () => {
+    if (title.trim().length === 0) {// Add a Toast on screen.
+      Toast.show('Missing title', {
+        duration: Toast.durations.SHORT,
+      });
+      return;
+    }
 
-    //   try {
-    //     const notes = JSON.parse(data) as Note[];
-    //     setNoteList(notes);
-    //   } catch (e) {
-    //     console.log("Error reading notes", e);
-    //   }
-    // });
-  }, []);
+    const newNote = {
+      id: `${noteList.length}`,
+      title: title,
+      subtitle: subtitle,
+      description: description,
+      color: "lightblue",
+    };
+
+    dispatch({ type: "ADD_NOTE", payload: newNote });
+    console.log("New Note")
+    
+    router.push("./");
+  }
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.layout}>
-          <ThemedInput
-            style={styles.searchInputContainer}
-            inputProps={{
-              onChangeText: onChangeText,
-              value: text,
-            }}
-            icon={<MaterialIcons name="search" size={24} color={textColor} />}
-          />
+    <>
+      <Stack.Screen 
+        options={{ 
+          title: '', 
+          headerShown: true, 
+          headerBackVisible: true,
+          headerStyle: { backgroundColor: 'transparent' },
+        }} 
+      />
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.container}>
+          <View style={styles.layout}>
+            <ThemedText type="title">New Note</ThemedText>
 
-          {noteList.length > 0 ? (
-            <View style={styles.notes}>
-              <FlatList
-                data={noteList}
-                renderItem={({ item }) => <Card {...item} />}
-                keyExtractor={(item) => item.id}
-              />
-            </View>
-          ) : <ThemedText>No notes here</ThemedText>}
-        </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
+            
+            <ThemedText type="default">Title</ThemedText>
+            <ThemedInput
+              style={styles.searchInputContainer}
+              inputProps={{
+                onChangeText: onChangeTitle,
+                value: title,
+              }}
+            />
+            
+            <ThemedText type="default">Subtitle</ThemedText>
+            <ThemedInput
+              style={styles.searchInputContainer}
+              inputProps={{
+                onChangeText: onChangeSubtitle,
+                value: subtitle,
+              }}
+            />
+            
+            <ThemedText type="default">Description</ThemedText>
+            <ThemedInput
+              style={styles.searchInputContainer}
+              inputProps={{
+                onChangeText: onChangeDescription,
+                value: description,
+              }}
+            />
+
+            <ThemedButton 
+              title="Save Note"
+              style={styles.saveNoteButton} 
+              onPress={() => saveNote()} 
+            />
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </>
   );
 }
 
@@ -96,4 +129,14 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginBottom: 16,
   },
+  saveNoteButton: {
+    backgroundColor: "lightblue",
+    position: "absolute",
+    bottom: 16,
+    right: 16,
+    padding: 16,
+    borderRadius: 50,
+    elevation: 3,
+    fontWeight: "semibold",
+  }
 });

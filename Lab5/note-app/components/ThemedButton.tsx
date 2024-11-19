@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, StyleSheet, Pressable, type ButtonProps, type StyleProp, type ViewStyle } from 'react-native';
+import { ThemedText } from './ThemedText';
 
 export type ThemedButtonProps = ButtonProps & {
   title?: string;
@@ -10,7 +11,7 @@ export function ThemedButton(props: ThemedButtonProps) {
   const { onPress, title = 'Save' } = props;
   return (
     <Pressable style={[styles.button, props.style]} onPress={onPress}>
-      <Text style={styles.text}>{title}</Text>
+      <ThemedText style={styles.text}>{title}</ThemedText>
     </Pressable>
   );
 }
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     fontWeight: 'bold',
     letterSpacing: 0.25,
-    color: 'white',
+    color: 'black',
   },
 });
 
